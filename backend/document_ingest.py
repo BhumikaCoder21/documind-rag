@@ -1,7 +1,9 @@
+import os
+import uuid
+
 import pymupdf
 import chromadb
 from sentence_transformers import SentenceTransformer
-import uuid
 
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -17,10 +19,20 @@ collection = client.get_or_create_collection(
 
 def ingest_pdf(pdf_path, filename):
 
+    # Generate a unique ID for this upload
+    document_id = str(uuid.uuid4())
+
+    # Remove previous versions of the same filename
+    # so old chunks cannot interfere.
+    collection.delete(
+        where={
+            "source": filename
+        }
+    )
+
     document = pymupdf.open(pdf_path)
 
     texts = []
-    embeddings = []
     metadatas = []
     ids = []
 
@@ -43,15 +55,14 @@ def ingest_pdf(pdf_path, filename):
 
                 texts.append(chunk)
 
-                metadata = {
+                metadatas.append({
                     "source": filename,
-                    "page": page_number + 1
-                }
-
-                metadatas.append(metadata)
+                    "page": page_number + 1,
+                    "document_id": document_id
+                })
 
                 ids.append(
-                    str(uuid.uuid4())
+                    f"{document_id}_{uuid.uuid4()}"
                 )
 
             start = end - overlap
@@ -59,7 +70,10 @@ def ingest_pdf(pdf_path, filename):
     document.close()
 
     if not texts:
-        return 0
+        return {
+            "document_id": document_id,
+            "chunks": 0
+        }
 
     embeddings = model.encode(texts).tolist()
 
@@ -70,4 +84,7 @@ def ingest_pdf(pdf_path, filename):
         metadatas=metadatas
     )
 
-    return len(texts)
+    return {
+        "document_id": document_id,
+        "chunks": len(texts)
+    }

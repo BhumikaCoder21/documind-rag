@@ -4,17 +4,17 @@ from agents.answerer import generate_answer
 from agents.validator import validate_answer
 
 
-def run_documind(question, source=None):
+def run_documind(question, document_id=None):
 
     # 1. Planner Agent
     plan = plan_question(question)
 
     # 2. Retriever Agent
     documents, metadatas = retrieve(
-    plan["question"],
-    top_k=3,
-    source=source
-    ) 
+        plan["question"],
+        top_k=3,
+        document_id=document_id
+    )
 
     # 3. Answer Agent
     answer = generate_answer(
@@ -33,8 +33,7 @@ def run_documind(question, source=None):
     return answer, metadatas, is_supported
 
 
-# Run the CLI only when this file is executed directly.
-# This prevents input() from running when FastAPI imports this file.
+# Allow this file to still be tested directly
 if __name__ == "__main__":
 
     question = input(

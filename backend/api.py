@@ -28,7 +28,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 class QuestionRequest(BaseModel):
     question: str
-    source: str
+    document_id: str
 
 
 @app.get("/")
@@ -60,7 +60,7 @@ async def upload_document(
             buffer
         )
 
-    chunk_count = ingest_pdf(
+    result = ingest_pdf(
         file_path,
         file.filename
     )
@@ -68,7 +68,8 @@ async def upload_document(
     return {
         "success": True,
         "filename": file.filename,
-        "chunks": chunk_count
+        "document_id": result["document_id"],
+        "chunks": result["chunks"]
     }
 
 
@@ -77,7 +78,7 @@ def ask_question(request: QuestionRequest):
 
     answer, sources, is_supported = run_documind(
         request.question,
-        request.source
+        request.document_id
     )
 
     unique_sources = []

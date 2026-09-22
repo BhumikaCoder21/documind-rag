@@ -13,7 +13,7 @@ collection = client.get_collection(
 )
 
 
-def retrieve(question, top_k=3, source=None):
+def retrieve(question, top_k=3, document_id=None):
 
     embedding = model.encode(question).tolist()
 
@@ -22,12 +22,16 @@ def retrieve(question, top_k=3, source=None):
         "n_results": top_k
     }
 
-    if source:
+    # Retrieve ONLY from the selected document
+    if document_id:
+
         query_kwargs["where"] = {
-            "source": source
+            "document_id": document_id
         }
 
-    results = collection.query(**query_kwargs)
+    results = collection.query(
+        **query_kwargs
+    )
 
     documents = results["documents"][0]
     metadatas = results["metadatas"][0]

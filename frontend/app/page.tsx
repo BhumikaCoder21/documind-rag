@@ -8,15 +8,23 @@ type Source = {
 };
 
 export default function Home() {
+  // -----------------------------
+  // Document state
+  // -----------------------------
   const [file, setFile] = useState<File | null>(null);
   const [uploadedFile, setUploadedFile] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [documentId, setDocumentId] = useState("");
 
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  // -----------------------------
+  // Question state
+  // -----------------------------
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   // -----------------------------
   // Upload PDF
@@ -47,13 +55,16 @@ export default function Home() {
         throw new Error(data.message || "Upload failed");
       }
 
+      // Save document information
       setUploadedFile(data.filename);
+      setDocumentId(data.document_id);
 
       setMessage(
         `✓ ${data.filename} indexed successfully (${data.chunks} chunks)`,
       );
     } catch (error) {
       console.error(error);
+
       setMessage("Unable to upload the PDF. Make sure the backend is running.");
     } finally {
       setUploading(false);
@@ -66,7 +77,7 @@ export default function Home() {
   const askQuestion = async () => {
     if (!question.trim()) return;
 
-    if (!uploadedFile) {
+    if (!documentId) {
       setAnswer("Please upload a PDF before asking a question.");
       return;
     }
@@ -84,7 +95,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           question,
-          source: uploadedFile,
+          document_id: documentId,
         }),
       });
 
@@ -98,6 +109,7 @@ export default function Home() {
       setSources(data.sources || []);
     } catch (error) {
       console.error(error);
+
       setAnswer(
         "Unable to connect to DocuMind. Make sure the backend is running.",
       );
@@ -108,7 +120,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      {/* Navbar */}
+      {/* ========================= */}
+      {/* NAVBAR */}
+      {/* ========================= */}
+
       <nav className="border-b border-slate-800">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <div>
@@ -116,32 +131,37 @@ export default function Home() {
 
             <p className="text-xs text-slate-400">AI Document Intelligence</p>
           </div>
-
-          <div className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300">
-            Local AI • RAG
-          </div>
         </div>
       </nav>
 
-      {/* Main */}
+      {/* ========================= */}
+      {/* MAIN */}
+      {/* ========================= */}
+
       <section className="mx-auto max-w-4xl px-6 pb-20 pt-16">
-        {/* Hero */}
+        {/* ========================= */}
+        {/* HERO */}
+        {/* ========================= */}
+
         <div className="text-center">
           <div className="mb-6 inline-block rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300">
-            🧠 Multi-Agent RAG
+            Your documents, now searchable.
           </div>
 
           <h2 className="text-5xl font-bold tracking-tight">
             Chat with your documents.
           </h2>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400">
-            Upload a PDF and ask questions. DocuMind retrieves relevant
-            information and generates grounded answers using a local AI model.
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-400">
+            Upload a PDF and ask questions. DocuMind finds relevant information
+            and generates grounded answers with source citations.
           </p>
         </div>
 
-        {/* Upload Card */}
+        {/* ========================= */}
+        {/* UPLOAD CARD */}
+        {/* ========================= */}
+
         <div className="mt-12 rounded-2xl border border-dashed border-slate-700 bg-slate-900 p-8 text-center">
           <div className="text-5xl">📄</div>
 
@@ -151,16 +171,28 @@ export default function Home() {
             Your document is processed locally.
           </p>
 
+          {/* File input */}
+
           <input
             type="file"
             accept=".pdf,application/pdf"
             onChange={(e) => {
               const selectedFile = e.target.files?.[0] || null;
+
               setFile(selectedFile);
+
               setMessage("");
+
+              // Reset previous document
+              setUploadedFile("");
+              setDocumentId("");
+              setAnswer("");
+              setSources([]);
             }}
             className="mx-auto mt-6 block w-full max-w-md rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm text-slate-300 file:mr-4 file:rounded-md file:border-0 file:bg-white file:px-4 file:py-2 file:font-medium file:text-slate-950"
           />
+
+          {/* Upload button */}
 
           <button
             onClick={uploadDocument}
@@ -170,10 +202,12 @@ export default function Home() {
             {uploading ? "Indexing PDF..." : "Upload & Index"}
           </button>
 
-          {/* Upload status */}
+          {/* Upload message */}
+
           {message && <p className="mt-4 text-sm text-slate-400">{message}</p>}
 
-          {/* Uploaded document */}
+          {/* Active document */}
+
           {uploadedFile && (
             <div className="mx-auto mt-5 flex max-w-md items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-left">
               <div>
@@ -189,7 +223,10 @@ export default function Home() {
           )}
         </div>
 
-        {/* Question */}
+        {/* ========================= */}
+        {/* QUESTION */}
+        {/* ========================= */}
+
         <div className="mt-8">
           <label className="mb-3 block text-sm font-medium text-slate-300">
             Ask your document
@@ -222,7 +259,10 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Answer */}
+        {/* ========================= */}
+        {/* ANSWER */}
+        {/* ========================= */}
+
         {answer && (
           <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <div className="mb-5 flex items-center gap-2">
@@ -234,6 +274,7 @@ export default function Home() {
             <p className="leading-7 text-slate-300">{answer}</p>
 
             {/* Sources */}
+
             {sources.length > 0 && (
               <div className="mt-6 border-t border-slate-800 pt-5">
                 <h4 className="text-sm font-semibold">📚 Sources</h4>
@@ -253,7 +294,10 @@ export default function Home() {
           </div>
         )}
 
-        {/* Architecture */}
+        {/* ========================= */}
+        {/* ARCHITECTURE */}
+        {/* ========================= */}
+
         <div className="mt-12 rounded-2xl border border-slate-800 bg-slate-900 p-6">
           <h3 className="font-semibold">How DocuMind works</h3>
 
