@@ -1,6 +1,5 @@
 from sentence_transformers import SentenceTransformer
 
-# Load a free local embedding model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 text = "Students must maintain a minimum attendance of 75%."
