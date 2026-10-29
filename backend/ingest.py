@@ -2,34 +2,18 @@ import pymupdf
 import chromadb
 from sentence_transformers import SentenceTransformer
 
-
-# -----------------------------
-# 1. Load embedding model
-# -----------------------------
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-
-# -----------------------------
-# 2. Connect to ChromaDB
-# -----------------------------
 client = chromadb.PersistentClient(path="./chroma_db")
 
 collection = client.get_or_create_collection(
     name="college_rules"
 )
 
-
-# -----------------------------
-# 3. Open PDF
-# -----------------------------
 pdf_path = "documents/college_rules.pdf"
 
 document = pymupdf.open(pdf_path)
 
-
-# -----------------------------
-# 4. Extract and chunk text
-# -----------------------------
 all_chunks = []
 
 for page_number, page in enumerate(document):
@@ -59,18 +43,10 @@ for page_number, page in enumerate(document):
 
 document.close()
 
-
-# -----------------------------
-# 5. Generate embeddings
-# -----------------------------
 texts = [chunk["text"] for chunk in all_chunks]
 
 embeddings = model.encode(texts).tolist()
 
-
-# -----------------------------
-# 6. Store in ChromaDB
-# -----------------------------
 ids = [f"chunk_{i}" for i in range(len(all_chunks))]
 
 metadatas = [
