@@ -8,9 +8,7 @@ type Source = {
 };
 
 export default function Home() {
-  // -----------------------------
-  // Document state
-  // -----------------------------
+ 
   const [file, setFile] = useState<File | null>(null);
   const [uploadedFile, setUploadedFile] = useState("");
   const [documentId, setDocumentId] = useState("");
@@ -18,17 +16,12 @@ export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
 
-  // -----------------------------
-  // Question state
-  // -----------------------------
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // -----------------------------
-  // Upload PDF
-  // -----------------------------
+
   const uploadDocument = async () => {
     if (!file) {
       setMessage("Please select a PDF first.");
@@ -55,7 +48,6 @@ export default function Home() {
         throw new Error(data.message || "Upload failed");
       }
 
-      // Save document information
       setUploadedFile(data.filename);
       setDocumentId(data.document_id);
 
@@ -71,9 +63,6 @@ export default function Home() {
     }
   };
 
-  // -----------------------------
-  // Ask question
-  // -----------------------------
   const askQuestion = async () => {
     if (!question.trim()) return;
 
@@ -120,9 +109,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      {/* ========================= */}
-      {/* NAVBAR */}
-      {/* ========================= */}
 
       <nav className="border-b border-slate-800">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
@@ -134,14 +120,8 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ========================= */}
-      {/* MAIN */}
-      {/* ========================= */}
 
       <section className="mx-auto max-w-4xl px-6 pb-20 pt-16">
-        {/* ========================= */}
-        {/* HERO */}
-        {/* ========================= */}
 
         <div className="text-center">
           <div className="mb-6 inline-block rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300">
@@ -158,10 +138,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* ========================= */}
-        {/* UPLOAD CARD */}
-        {/* ========================= */}
-
         <div className="mt-12 rounded-2xl border border-dashed border-slate-700 bg-slate-900 p-8 text-center">
           <div className="text-5xl">📄</div>
 
@@ -171,7 +147,6 @@ export default function Home() {
             Your document is processed locally.
           </p>
 
-          {/* File input */}
 
           <input
             type="file"
@@ -183,7 +158,6 @@ export default function Home() {
 
               setMessage("");
 
-              // Reset previous document
               setUploadedFile("");
               setDocumentId("");
               setAnswer("");
@@ -191,8 +165,6 @@ export default function Home() {
             }}
             className="mx-auto mt-6 block w-full max-w-md rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm text-slate-300 file:mr-4 file:rounded-md file:border-0 file:bg-white file:px-4 file:py-2 file:font-medium file:text-slate-950"
           />
-
-          {/* Upload button */}
 
           <button
             onClick={uploadDocument}
@@ -202,11 +174,8 @@ export default function Home() {
             {uploading ? "Indexing PDF..." : "Upload & Index"}
           </button>
 
-          {/* Upload message */}
-
           {message && <p className="mt-4 text-sm text-slate-400">{message}</p>}
 
-          {/* Active document */}
 
           {uploadedFile && (
             <div className="mx-auto mt-5 flex max-w-md items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-left">
@@ -223,9 +192,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* ========================= */}
-        {/* QUESTION */}
-        {/* ========================= */}
 
         <div className="mt-8">
           <label className="mb-3 block text-sm font-medium text-slate-300">
@@ -259,10 +225,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* ========================= */}
-        {/* ANSWER */}
-        {/* ========================= */}
-
         {answer && (
           <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <div className="mb-5 flex items-center gap-2">
@@ -273,7 +235,6 @@ export default function Home() {
 
             <p className="leading-7 text-slate-300">{answer}</p>
 
-            {/* Sources */}
 
             {sources.length > 0 && (
               <div className="mt-6 border-t border-slate-800 pt-5">
@@ -294,9 +255,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* ========================= */}
-        {/* ARCHITECTURE */}
-        {/* ========================= */}
 
         <div className="mt-12 rounded-2xl border border-slate-800 bg-slate-900 p-6">
           <h3 className="font-semibold">How DocuMind works</h3>
