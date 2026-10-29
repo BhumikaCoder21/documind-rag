@@ -22,7 +22,6 @@ def retrieve(question, top_k=3, document_id=None):
         "n_results": top_k
     }
 
-    # Retrieve ONLY from the selected document
     if document_id:
 
         query_kwargs["where"] = {
