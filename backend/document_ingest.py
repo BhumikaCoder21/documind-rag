@@ -19,11 +19,7 @@ collection = client.get_or_create_collection(
 
 def ingest_pdf(pdf_path, filename):
 
-    # Generate a unique ID for this upload
     document_id = str(uuid.uuid4())
-
-    # Remove previous versions of the same filename
-    # so old chunks cannot interfere.
     collection.delete(
         where={
             "source": filename
